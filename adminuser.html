@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Admin</title>
+</head>
+<body>
+  <h1>Liste des utilisateurs</h1>
+  <ul id="userList">
+  </ul>
+
+  <script>
+    // Supprimer un user
+    function deleteUser(userId) {
+      fetch(`/admin/delete-user/${userId}`, { method: 'DELETE' })
+        .then(response => {
+            if (response.ok) {
+                fetchUserList();
+            } 
+            else {
+                console.error('Erreur lors de la suppression');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la suppression:', error);
+        });
+    }
+
+    //Récupérer utilisateurs depuis le serveur
+    function fetchUserList() {
+      fetch('/admin/user-list')
+        .then(response => response.json())
+        .then(users => {
+          const userListElement = document.getElementById('userList');
+          // Effacer la liste actuelle des utilisateurs
+          userListElement.innerHTML = '';
+
+          // Ajouter chaque utilisateur à la liste
+          users.forEach(user => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `${user.firstname} ${user.lastname} - ${user.email} <button onclick="deleteUser(${user.id})">Supprimer</button>`;
+            userListElement.appendChild(listItem);
+          });
+        })
+        .catch(error => {
+          console.error('Erreur lors de la récupération de la liste des utilisateurs:', error);
+        });
+    }
+
+    // Appeler la fonction pour récupérer la liste des utilisateurs au chargement de la page
+    window.onload = fetchUserList;
+  </script>
+</body>
+</html>
